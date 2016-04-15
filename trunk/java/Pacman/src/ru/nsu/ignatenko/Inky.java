@@ -295,10 +295,13 @@ public class Inky implements Ghost,  ActionListener
             if (directionX == LEFT && !obstacleOnLeft && (screenData[pos - 1] == LEFT_PORTAL))
             {
                 coordX += blocksize * (ncollumn - 2);
-            } else if (directionX == RIGHT && !obstacleOnRight && (screenData[pos + 1] == RIGHT_PORTAL))
+            }
+            else if (directionX == RIGHT && !obstacleOnRight && (screenData[pos + 1] == RIGHT_PORTAL))
             {
                 coordX -= blocksize * (ncollumn - 2);
-            } else {
+            }
+            else
+            {
                 coordX += directionX * currentSpeed;
                 coordY += directionY * currentSpeed;
             }
