@@ -59,7 +59,8 @@ public class Inky implements Ghost,  ActionListener
     private boolean canMove = false;
 
     private Timer timer1 = new Timer(7000, this);
-    private Timer timer2;
+    private Timer timer2 = new Timer(10000, this);
+
     PacMan pacman;
     Blinky blinky;
 
@@ -69,6 +70,22 @@ public class Inky implements Ghost,  ActionListener
         ncollumn = ncollumn_;
         blocksize = blocksize_;
         screenData = screenData_;
+        startPosX = x;
+        startPosY = y;
+        posX = startPosX;
+        posY = startPosY;
+        coordX = x * blocksize + blocksize/2;
+        coordY = y * blocksize + blocksize/2;
+    }
+
+    public void stop()
+    {
+        timer1.stop();
+        timer2.stop();
+    }
+
+    public void setStartPos(int x, int y)
+    {
         startPosX = x;
         startPosY = y;
         posX = startPosX;
@@ -91,8 +108,31 @@ public class Inky implements Ghost,  ActionListener
         return coordY;
     }
 
+    public Direction getDirection()
+    {
+        if(directionX == -1)
+        {
+            return Direction.Left;
+        }
+        else if(directionX == 1)
+        {
+            return Direction.Right;
+        }
+        else if(directionY == -1)
+        {
+            return Direction.Up;
+        }
+        else
+        {
+            return Direction.Down;
+        }
+    }
+
     public int getPos()
     {
+        posX = coordX / blocksize;
+        posY = coordY / blocksize;
+        pos = posY * ncollumn + posX;
         return pos;
     }
 
@@ -112,17 +152,15 @@ public class Inky implements Ghost,  ActionListener
 
     private void changeMode()
     {
-        if(currentMode == Mode.Scatter)
-        {
-            currentMode = Mode.Chase;
-            timer1.stop();
-            timer1 = new Timer(20000, this);
-            timer1.start();
-        }
-        else
-        {
-            makeScatter();
-        }
+            if(currentMode == Mode.Scatter)
+            {
+                currentMode = Mode.Chase;
+            }
+            else
+            {
+                currentMode = Mode.Scatter;
+                timer1.restart();
+            }
     }
 
     public void stopFrighten()
@@ -132,12 +170,9 @@ public class Inky implements Ghost,  ActionListener
         timer1.start();
     }
 
-    public void makeScatter()
+    public void setScatterMode()
     {
         currentMode = Mode.Scatter;
-        timer1.stop();
-        timer1 = new Timer(7000, this);
-        timer1.start();
     }
 
     private double calculateDistance(int posX_, int posY_)
@@ -149,10 +184,11 @@ public class Inky implements Ghost,  ActionListener
     {
         if(canMove)
         {
-            if(is_first)
+            if(is_first && currentMode != Mode.Frightened && currentMode != Mode.FrightenedEnd)
             {
-                timer1.start();
                 is_first = false;
+                timer1.setDelay(20000);
+                timer1.restart();
             }
 
             if (coordX % blocksize == blocksize/2 && coordY % blocksize == blocksize/2) // if blinky enter in center of the cell
@@ -162,11 +198,11 @@ public class Inky implements Ghost,  ActionListener
 
                 if (is_start)
                 {
-                    posTargetX = startPosX + 1;
-                    posTargetY = startPosY - 1;
+                    posTargetX = startPosX + 2;
+                    posTargetY = startPosY - 2;
                 }
 
-                else if (currentMode == Mode.Frightened)
+                else if (currentMode == Mode.Frightened || currentMode == Mode.FrightenedEnd)
                 {
                     currentSpeed = frightenSpeed;
 
@@ -199,7 +235,7 @@ public class Inky implements Ghost,  ActionListener
                 posX = coordX / blocksize;
                 posY = coordY / blocksize;
                 pos = posY * ncollumn + posX;
-                if(pos == (startPosY-1) * ncollumn + startPosX+1)
+                if(is_start && pos == (startPosY-1) * ncollumn + startPosX+1)
                 {
                     is_start = false;
                 }
@@ -269,9 +305,17 @@ public class Inky implements Ghost,  ActionListener
         }
     }
 
+//    public void restartGame()
+//    {
+//        returnToInitialPosition();
+//        currentMode = Mode.Scatter;
+//
+//    }
     public void returnToInitialPosition()
     {
+        timer1.stop();
         is_start = true;
+        is_first = true;
         posX = startPosX;
         posY = startPosY;
         pos = posY * ncollumn + posX;
@@ -286,29 +330,29 @@ public class Inky implements Ghost,  ActionListener
 
     public void setFrightenedMode()
     {
-        if(currentMode == Mode.Frightened)
-        {
-            timer2.stop();
-        }
-        else
+        if(currentMode != Mode.Frightened && currentMode != Mode.FrightenedEnd)
         {
             timer1.stop();
-
             lastMode = currentMode;
-            currentMode = Mode.Frightened;
         }
-
-        timer2 = new Timer(10000, this);
-        timer2.start();
-
-        nextDirectionX = -directionX;
-        nextDirectionY = -directionY;
+        currentMode = Mode.Frightened;
+        timer2.restart();
+        if(!is_start)
+        {
+            nextDirectionX = -directionX;
+            nextDirectionY = -directionY;
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e)
     {
         if(currentMode == Mode.Frightened)
+        {
+            currentMode = Mode.FrightenedEnd;
+            timer2.setDelay(4000);
+        }
+        else if(currentMode == Mode.FrightenedEnd)
         {
             currentMode = lastMode;
             timer2.stop();
@@ -317,8 +361,11 @@ public class Inky implements Ghost,  ActionListener
         else
         {
             changeMode();
-            nextDirectionX = -directionX;
-            nextDirectionY = -directionY;
+            if(!is_start)
+            {
+                nextDirectionX = -directionX;
+                nextDirectionY = -directionY;
+            }
         }
     }
 }

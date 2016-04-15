@@ -1,38 +1,17 @@
 package ru.nsu.ignatenko;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+enum Direction
+{
+    Left, Right, Up, Down
+};
 
 public class PacManGame
 {
-    private final int screenDataPattern[] = 
-            {
-                1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                1,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,1,
-                1,3,1,1,1,2,1,1,1,1,2,1,2,1,1,1,1,2,1,1,1,3,1,
-                1,2,1,1,1,2,1,1,1,1,2,1,2,1,1,1,1,2,1,1,1,2,1,
-                1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
-                1,2,1,1,1,2,1,2,1,1,1,1,1,1,1,2,1,2,1,1,1,2,1,
-                1,2,2,2,2,2,1,2,1,1,1,1,1,1,1,2,1,2,2,2,2,2,1,
-                1,1,1,1,1,2,1,2,2,2,2,1,2,2,2,2,1,2,1,1,1,1,1,
-                1,1,1,1,1,2,1,1,1,1,0,1,0,1,1,1,1,2,1,1,1,1,1,
-                1,1,1,1,1,2,1,0,0,0,0,0,0,0,0,0,1,2,1,1,1,1,1,
-                1,1,1,1,1,2,1,0,1,1,1,6,1,1,1,0,1,2,1,1,1,1,1,
-                4,0,0,0,0,2,0,0,1,0,0,0,0,0,1,0,0,2,0,0,0,0,5,
-                1,1,1,1,1,2,1,0,1,1,1,1,1,1,1,0,1,2,1,1,1,1,1,
-                1,1,1,1,1,2,1,0,0,0,0,0,0,0,0,0,1,2,1,1,1,1,1,
-                1,1,1,1,1,2,1,0,1,1,1,1,1,1,1,0,1,2,1,1,1,1,1,
-                1,1,1,1,1,2,1,0,1,1,1,1,1,1,1,0,1,2,1,1,1,1,1,
-                1,2,2,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,2,2,1,
-                1,2,1,1,1,2,1,1,1,1,2,1,2,1,1,1,1,2,1,1,1,2,1,
-                1,3,2,2,1,2,2,2,2,2,2,0,2,2,2,2,2,2,1,2,2,3,1,
-                1,1,1,2,1,2,1,2,1,1,1,1,1,1,1,2,1,2,1,2,1,1,1,
-                1,2,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,2,1,
-                1,2,1,1,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,2,1,
-                1,2,1,1,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,2,1,
-                1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,
-                1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-            };
-
     private int screenData[];
 
     private final int nrow = 25;
@@ -42,10 +21,21 @@ public class PacManGame
     private final int SUPER_DOT = 3;
     private final int DOT = 2;
 
-    private final Ghost ghosts[] = new Ghost[4];
-    private final PacMan pacman;
+    private final int BLINKY_PLACE = 7;
+    private final int PINKY_PLACE = 8;
+    private final int INKY_PLACE = 9;
+    private final int CLYDE_PLACE = 10;
+    private final int PACMAN_PLACE = 11;
+
+    private Map<String, Integer> ghostPlaces = new HashMap<>(4);
+
+    private Ghost ghosts[] = new Ghost[4];
+    private PacMan pacman;
 
     private final int countOfAllDots = 194;
+    private final int mazeCount = 3;
+    private int mazeNumber = 0;
+    private String mazeFiles[] = new String[mazeCount];
     private int leftLives = 3;
     private int score = 0;
 
@@ -55,16 +45,34 @@ public class PacManGame
 
     public PacManGame()
     {
-        screenData = Arrays.copyOf(screenDataPattern, nrow*ncollumn);
+        mazeFiles[0] = "map1.txt";
+        mazeFiles[1] = "map2.txt";
+        mazeFiles[2] = "map3.txt";
+
+        ghostPlaces.put("Blinky", BLINKY_PLACE);
+        ghostPlaces.put("Pinky", PINKY_PLACE);
+        ghostPlaces.put("Inky", INKY_PLACE);
+        ghostPlaces.put("Clyde", CLYDE_PLACE);
+    }
+
+    public void initGame()
+    {
+        screenData  = loadScreenData(mazeFiles[mazeNumber]);
         pacman = new PacMan(screenData, nrow, ncollumn, blocksize, 11, 18);
         ghosts[0] = new Blinky(screenData, nrow, ncollumn, blocksize, 11, 9);
         ghosts[1] = new Pinky(screenData, nrow, ncollumn, blocksize, 11, 11);
         ghosts[2] = new Inky(screenData, nrow, ncollumn, blocksize, 10, 11);
         ghosts[3] = new Clyde(screenData, nrow, ncollumn, blocksize, 12, 11);
 
+        placePacman();
+        for (Ghost ghost : ghosts)
+        {
+            placeGhost(ghost);
+        }
+
         ghosts[2].setBlinky((Blinky) ghosts[0]);
 
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
             ghost.setVictim(pacman);
         }
@@ -75,17 +83,70 @@ public class PacManGame
         controller = controller_;
     }
 
+    public void setMaze(int number)
+    {
+        mazeNumber = number;
+    }
+
+    public void placePacman()
+    {
+        int posX = 0;
+        int posY = 0;
+        for (int data : screenData)
+        {
+            if(data == PACMAN_PLACE)
+            {
+                pacman.setStartPos(posX, posY);
+                break;
+            }
+            if(posX == ncollumn-1)
+            {
+                posX = 0;
+                ++posY;
+            }
+            else
+            {
+                ++posX;
+            }
+        }
+    }
+
+    public void placeGhost(Ghost ghost)
+    {
+        int posX = 0;
+        int posY = 0;
+        for (int data : screenData)
+        {
+            if(data == ghostPlaces.get(ghost.getName()))
+            {
+                ghost.setStartPos(posX, posY);
+                break;
+            }
+            if(posX == ncollumn-1)
+            {
+                posX = 0;
+                ++posY;
+            }
+            else
+            {
+                ++posX;
+            }
+        }
+    }
+
+
     public void play()
     {
-        pacman.move();
-        for(Ghost ghost : ghosts)
-        {
-            ghost.move();
-        }
+            pacman.move();
+            int pacmanPos = pacman.getPos();
 
-        int pacmanPos = pacman.getPos();
-        synchronized((Object)pacmanPos)
-        {
+            checkCollisions(pacmanPos);
+            for (Ghost ghost : ghosts)
+            {
+                ghost.move();
+            }
+            checkCollisions(pacmanPos);
+
             if (screenData[pacmanPos] == DOT)
             {
                 screenData[pacmanPos] -= DOT;
@@ -102,99 +163,112 @@ public class PacManGame
                 }
             }
 
-            for (Ghost ghost : ghosts)
+            int currentCountOfDots = countNumberOfDots();
+            if (currentCountOfDots == countOfAllDots - 30)
             {
-                if (ghost.getPos() == pacmanPos)
+                for (Ghost ghost : ghosts)
                 {
-                    if (ghost.getMode() == Mode.Frightened)
+                    if (ghost.getName().equals("Inky"))
                     {
-                        score += 200;
-                        ghost.returnToInitialPosition();
-                        ghost.stopFrighten();
+                        ghost.canMove();
                     }
-                    else
+                }
+            }
+            else if (currentCountOfDots == countOfAllDots / 3)
+            {
+                for (Ghost ghost : ghosts)
+                {
+                    if (ghost.getName().equals("Clyde"))
                     {
-                        --leftLives;
-                        pacmanDead = true;
-                        pacman.returnToInitialPosition();
+                        ghost.canMove();
                     }
+                }
+            }
+            else if (currentCountOfDots == 0)
+            {
+                for (Ghost ghost : ghosts)
+                {
+                    ghost.returnToInitialPosition();
+                    ghost.setScatterMode();
+                }
+                controller.win();
+            }
+    }
+
+
+    private void checkCollisions(int pacmanPos)
+    {
+        for (Ghost ghost : ghosts)
+        {
+            
+            if (ghost.getPos() == pacmanPos)
+            {
+                if (ghost.getMode() == Mode.Frightened || ghost.getMode() == Mode.FrightenedEnd)
+                {
+                    score += 200;
+                    ghost.returnToInitialPosition();
+                    ghost.stopFrighten();
+                }
+                else
+                {
+                    --leftLives;
+                    pacmanDead = true;
+                    pacman.returnToInitialPosition();
                 }
             }
         }
 
-        if(pacmanDead)
+        if (pacmanDead)
         {
-            for(Ghost ghost : ghosts)
+            for (Ghost ghost : ghosts)
             {
                 ghost.returnToInitialPosition();
-                ghost.makeScatter();
+                ghost.setScatterMode();
             }
 
-            if(leftLives == 0)
+            if (leftLives == 0)
             {
                 controller.gameOver();
                 return;
             }
             pacmanDead = false;
         }
+    }
 
-        int currentCountOfDots = countNumberOfDots();
-        if(currentCountOfDots == countOfAllDots - 30)
+    public void stop()
+    {
+        for (Ghost ghost : ghosts)
         {
-            for(Ghost ghost : ghosts)
-            {
-                if(ghost.getName().equals("Inky"))
-                {
-                    ghost.canMove();
-                }
-            }
-        }
-        else if(currentCountOfDots == countOfAllDots/3)
-        {
-            for(Ghost ghost : ghosts)
-            {
-                if(ghost.getName().equals("Clyde"))
-                {
-                    ghost.canMove();
-                }
-            }
-        }
-        else if(currentCountOfDots == 0)
-        {
-            for(Ghost ghost : ghosts)
-            {
-                ghost.returnToInitialPosition();
-                ghost.makeScatter();
-            }
-            controller.win();
+            ghost.stop();
         }
     }
 
+
     public void recoverData()
     {
-        screenData = Arrays.copyOf(screenDataPattern, nrow*ncollumn);
+        screenData  = loadScreenData(mazeFiles[mazeNumber]);
         pacmanDead = false;
         leftLives = 3;
         score = 0;
 
         pacman.returnToInitialPosition();
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Inky") || ghost.getName().equals("Clyde"))
+            if (ghost.getName().equals("Inky") || ghost.getName().equals("Clyde"))
             {
                 ghost.cantMove();
             }
             ghost.returnToInitialPosition();
-            ghost.makeScatter();
+            ghost.setScatterMode();
         }
     }
 
     private int countNumberOfDots()
     {
         int count = 0;
-        for(int val : screenData)
+        for (int val : screenData)
         {
-            if(val == DOT || val == SUPER_DOT)
+            if (val == DOT || val == SUPER_DOT)
             {
                 ++count;
             }
@@ -202,25 +276,77 @@ public class PacManGame
         return count;
     }
 
-    public int getScore(){return score;}
+    public int getScore()
+    {
+        return score;
+    }
 
-    public int getCountOfLives(){return leftLives;}
+    public int getCountOfLives()
+    {
+        return leftLives;
+    }
 
-    public int [] getScreenData(){return screenData;}
+    public int[] getScreenData()
+    {
+        return screenData;
+    }
 
-    public void setPacManDirection(int directionX, int directionY){pacman.setDirection(directionX, directionY);}
+    public void setPacManDirection(int directionX, int directionY)
+    {
+        pacman.setDirection(directionX, directionY);
+    }
 
-    public int getPacManDirectionX(){return pacman.getDirectionX();}
-    public int getPacManDirectionY(){return pacman.getDirectionY();}
+    public int getPacManDirectionX()
+    {
+        return pacman.getDirectionX();
+    }
 
-    public int getPacManCoordX() {return pacman.getCoordX();}
-    public int getPacManCoordY() {return pacman.getCoordY();}
+    public int getPacManDirectionY()
+    {
+        return pacman.getDirectionY();
+    }
+
+    public int getPacManCoordX()
+    {
+        return pacman.getCoordX();
+    }
+
+    public int getPacManCoordY()
+    {
+        return pacman.getCoordY();
+    }
+
+    public int getGhostDirection(String ghostName)
+    {
+        int direction = 0;
+        for (Ghost ghost : ghosts)
+        {
+            if (ghost.getName().equals(ghostName))
+            {
+                direction = ghost.getDirection().ordinal();
+            }
+        }
+        return direction;
+    }
+
+    public Mode getGhostMode(String ghostName)
+    {
+        Mode mode = Mode.Scatter;
+        for (Ghost ghost : ghosts)
+        {
+            if (ghost.getName().equals(ghostName))
+            {
+                mode = ghost.getMode();
+            }
+        }
+        return mode;
+    }
 
     public int getBlinkyCoordX()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Blinky"))
+            if (ghost.getName().equals("Blinky"))
             {
                 return ghost.getCoordX();
             }
@@ -230,9 +356,9 @@ public class PacManGame
 
     public int getPinkyCoordX()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Pinky"))
+            if (ghost.getName().equals("Pinky"))
             {
                 return ghost.getCoordX();
             }
@@ -242,9 +368,9 @@ public class PacManGame
 
     public int getInkyCoordX()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Inky"))
+            if (ghost.getName().equals("Inky"))
             {
                 return ghost.getCoordX();
             }
@@ -254,9 +380,9 @@ public class PacManGame
 
     public int getClydeCoordX()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Clyde"))
+            if (ghost.getName().equals("Clyde"))
             {
                 return ghost.getCoordX();
             }
@@ -266,9 +392,9 @@ public class PacManGame
 
     public int getBlinkyCoordY()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Blinky"))
+            if (ghost.getName().equals("Blinky"))
             {
                 return ghost.getCoordY();
             }
@@ -278,9 +404,9 @@ public class PacManGame
 
     public int getPinkyCoordY()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Pinky"))
+            if (ghost.getName().equals("Pinky"))
             {
                 return ghost.getCoordY();
             }
@@ -290,9 +416,9 @@ public class PacManGame
 
     public int getInkyCoordY()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Inky"))
+            if (ghost.getName().equals("Inky"))
             {
                 return ghost.getCoordY();
             }
@@ -302,9 +428,9 @@ public class PacManGame
 
     public int getClydeCoordY()
     {
-        for(Ghost ghost : ghosts)
+        for (Ghost ghost : ghosts)
         {
-            if(ghost.getName().equals("Clyde"))
+            if (ghost.getName().equals("Clyde"))
             {
                 return ghost.getCoordY();
             }
@@ -312,51 +438,77 @@ public class PacManGame
         return -1;
     }
 
-    public Mode getBlinkyMode()
+    public int[] loadScreenData(String filename)
     {
-        for(Ghost ghost : ghosts)
-        {
-            if(ghost.getName().equals("Blinky"))
-            {
-                return ghost.getMode();
-            }
-        }
-        return Mode.Scatter;
-    }
+        int[] screenData;
+        Map<Integer, Integer> symbolCodes;
+        ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 
-    public Mode getPinkyMode()
-    {
-        for(Ghost ghost : ghosts)
+        try(InputStream file = systemClassLoader.getResourceAsStream(filename))
         {
-            if(ghost.getName().equals("Pinky"))
+            if(file != null)
             {
-                return ghost.getMode();
-            }
-        }
-        return Mode.Scatter;
-    }
+                screenData = new int[nrow * ncollumn];
+                symbolCodes = new HashMap<>();
 
-    public Mode getInkyMode()
-    {
-        for(Ghost ghost : ghosts)
-        {
-            if(ghost.getName().equals("Inky"))
-            {
-                return ghost.getMode();
-            }
-        }
-        return Mode.Scatter;
-    }
+                symbolCodes.put(32, 0);   //  [space] - empty
+                symbolCodes.put(35, 1);   //  # - wall
+                symbolCodes.put(46, 2);   //  . - dot
+                symbolCodes.put(111, 3);  //  o - super dot
+                symbolCodes.put(60, 4);   //  < - left portal
+                symbolCodes.put(62, 5);   //  > - right portal
+                symbolCodes.put(43, 6);   //  + - ghost door
+                symbolCodes.put(66, 7);   //  B - Blinky start position
+                symbolCodes.put(80, 8);   //  P - Pinky start position
+                symbolCodes.put(73, 9);   //  I - Inky start position
+                symbolCodes.put(67, 10);  //  C - Clyde start position
+                symbolCodes.put(64, 11);  //  @ - Pacman start position
 
-    public Mode getClydeMode()
-    {
-        for(Ghost ghost : ghosts)
-        {
-            if(ghost.getName().equals("Clyde"))
+                final int END_OF_LINE1 = 13; // /r
+                final int END_OF_LINE2 = 10; // /n
+                final int END_OF_FILE = -1;
+
+                int с;
+                Integer output;
+                for(int i = 0; i < nrow; i++)
+                {
+                    for(int j = 0; j < ncollumn; j++)
+                    {
+                        с = file.read();
+                        if((output = symbolCodes.get(с)) != null)
+                        {
+                            screenData[i * ncollumn + j] = output.intValue();
+                        }
+                        else
+                        {
+                            throw new IOException("Invalid file " + i + " " + j);
+                        }
+                    }
+                    с = file.read();
+                    if (с != END_OF_LINE2)
+                    {
+                        if(!(с == END_OF_LINE1 && file.read() == END_OF_LINE2))
+                        {
+                            throw new IOException("Invalid file " + i);
+                        }
+                    }
+                }
+                if(file.read() != END_OF_FILE)
+                {
+                    throw new IOException("Garbage in the end of file");
+                }
+            }
+            else
             {
-                return ghost.getMode();
+                throw new IOException("File not found");
             }
         }
-        return Mode.Scatter;
+        catch(IOException e)
+        {
+            System.out.println("Error: " + e.getMessage());
+            throw new RuntimeException();
+        }
+        return screenData;
     }
 }
+

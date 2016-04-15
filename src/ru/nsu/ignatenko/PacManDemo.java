@@ -9,10 +9,9 @@ public class PacManDemo extends JFrame
     {
         PacManGame pacmanGame = new PacManGame();
         Controller controller = new Controller();
-        View view = new View(607, 750);
+        View view = new View(607, 750, controller);
 
         pacmanGame.addController(controller);
-        view.addController(controller);
         controller.addPacManGame(pacmanGame);
         controller.addView(view);
         add(view);

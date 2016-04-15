@@ -33,7 +33,9 @@ public class Controller  implements ActionListener
         pacmanGame = pacmanGame_;
         screenData = pacmanGame.getScreenData();
     }
-    
+
+    public int getGhostDirection(String ghostName) {return pacmanGame.getGhostDirection(ghostName);}
+    public Mode getGhostMode(String ghostName) {return pacmanGame.getGhostMode(ghostName);}
     public int getScore(){return pacmanGame.getScore();}
     public int getCountOfLives(){return pacmanGame.getCountOfLives();}
 
@@ -52,14 +54,15 @@ public class Controller  implements ActionListener
     public int getPacManDirectionX(){return pacmanGame.getPacManDirectionX();}
     public int getPacManDirectionY(){return pacmanGame.getPacManDirectionY();}
 
-    public Mode getBlinkyMode(){return pacmanGame.getBlinkyMode();}
-    public Mode getPinkyMode(){return pacmanGame.getPinkyMode();}
-    public Mode getInkyMode(){return pacmanGame.getInkyMode();}
-    public Mode getClydeMode(){return pacmanGame.getClydeMode();}
-
     public void processKey(int key)
     {
-        if (ingame)
+        if(key == KeyEvent.VK_ESCAPE)
+        {
+            timer.stop();
+            view.pauseGame();
+            pacmanGame.stop();
+        }
+        else if (ingame)
         {
             if (key == KeyEvent.VK_LEFT)
             {
@@ -77,23 +80,15 @@ public class Controller  implements ActionListener
             {
                 pacmanGame.setPacManDirection(NO_MOTION, DOWN);
             }
-            else if (key == KeyEvent.VK_PAUSE)
+            else if(key == KeyEvent.VK_R)
             {
-                if (timer.isRunning())
-                {
-                    timer.stop();
-                }
-                else
-                {
-                    timer.start();
-                }
+                restart();
             }
         }
-        else if(key == 's' || key == 'S')
+        else if(key == KeyEvent.VK_R)
         {
-            view.startGame(screenData);
-            ingame = true;
-            timer.start();
+            restart();
+            view.restart();
         }
     }
 
@@ -127,4 +122,20 @@ public class Controller  implements ActionListener
         view.setWin();
         ingame = false;
     }
+
+    public void resumeGame()
+    {
+        timer.start();
+    }
+
+    public void setMaze(int number)
+    {
+        pacmanGame.setMaze(number);
+    }
+
+    public void initGame()
+    {
+        pacmanGame.initGame();
+    }
 }
+

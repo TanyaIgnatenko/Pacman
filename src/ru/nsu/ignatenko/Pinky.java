@@ -16,16 +16,16 @@ public class Pinky implements Ghost,  ActionListener
     private int ncollumn;
     private int nrow;
 
-    private final int WALL = 1;
-    private final int LEFT_PORTAL = 4;
-    private final int RIGHT_PORTAL = 5;
-    private final int GHOST_DOOR = 6;
+    private static final int WALL = 1;
+    private static final int LEFT_PORTAL = 4;
+    private static final int RIGHT_PORTAL = 5;
+    private static final int GHOST_DOOR = 6;
 
-    private final int LEFT = -1;
-    private final int UP = -1;
-    private final int RIGHT = 1;
-    private final int DOWN = 1;
-    private final int NO_MOTION = 0;
+    private static final int LEFT = -1;
+    private static final int UP = -1;
+    private static final int RIGHT = 1;
+    private static final int DOWN = 1;
+    private static final int NO_MOTION = 0;
 
     private int startPosX;
     private int startPosY;
@@ -50,12 +50,12 @@ public class Pinky implements Ghost,  ActionListener
     private Mode currentMode = Mode.Scatter;
     private Mode lastMode;
 
-    private final int normalSpeed = 6;
+    private final int normalSpeed = 4;
     private final int frightenSpeed = 2;
     private int currentSpeed = normalSpeed;
 
     private Timer timer1 = new Timer(7000, this);
-    private Timer timer2;
+    private Timer timer2 = new Timer(10000, this);
     PacMan pacman;
 
     public Pinky(int screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
@@ -71,7 +71,24 @@ public class Pinky implements Ghost,  ActionListener
         coordX = x * blocksize + blocksize/2;
         coordY = y * blocksize + blocksize/2;
 
+        timer1.setDelay(20000);
         timer1.start();
+    }
+
+    public void stop()
+    {
+        timer1.stop();
+        timer2.stop();
+    }
+
+    public void setStartPos(int x, int y)
+    {
+        startPosX = x;
+        startPosY = y;
+        posX = startPosX;
+        posY = startPosY;
+        coordX = x * blocksize + blocksize/2;
+        coordY = y * blocksize + blocksize/2;
     }
 
     public String getName(){return name;}
@@ -88,8 +105,31 @@ public class Pinky implements Ghost,  ActionListener
         return coordY;
     }
 
+    public Direction getDirection()
+    {
+        if(directionX == -1)
+        {
+            return Direction.Left;
+        }
+        else if(directionX == 1)
+        {
+            return Direction.Right;
+        }
+        else if(directionY == -1)
+        {
+            return Direction.Up;
+        }
+        else
+        {
+            return Direction.Down;
+        }
+    }
+
     public int getPos()
     {
+        posX = coordX / blocksize;
+        posY = coordY / blocksize;
+        pos = posY * ncollumn + posX;
         return pos;
     }
 
@@ -109,13 +149,11 @@ public class Pinky implements Ghost,  ActionListener
         if(currentMode == Mode.Scatter)
         {
             currentMode = Mode.Chase;
-            timer1.stop();
-            timer1 = new Timer(20000, this);
-            timer1.start();
         }
         else
         {
-            makeScatter();
+            currentMode = Mode.Scatter;
+            timer1.restart();
         }
     }
 
@@ -126,13 +164,13 @@ public class Pinky implements Ghost,  ActionListener
         timer1.start();
     }
 
-    public void makeScatter()
+    public void setScatterMode()
     {
         currentMode = Mode.Scatter;
-        timer1.stop();
-        timer1 = new Timer(7000, this);
-        timer1.start();
+        timer1.setDelay(20000);
+        timer1.restart();
     }
+
     private double calculateDistance(int posX_, int posY_)
     {
         return ((posX_ - posTargetX) * (posX_ - posTargetX) + (posY_ - posTargetY) * (posY_ - posTargetY));
@@ -145,7 +183,7 @@ public class Pinky implements Ghost,  ActionListener
             directionX = nextDirectionX;
             directionY = nextDirectionY;
 
-            if(currentMode == Mode.Frightened)
+            if(currentMode == Mode.Frightened || currentMode == Mode.FrightenedEnd)
             {
                 currentSpeed = frightenSpeed;
 
@@ -266,20 +304,13 @@ public class Pinky implements Ghost,  ActionListener
 
     public void setFrightenedMode()
     {
-        if(currentMode == Mode.Frightened)
-        {
-            timer2.stop();
-        }
-        else
+        if(currentMode != Mode.Frightened && currentMode != Mode.FrightenedEnd)
         {
             timer1.stop();
-
             lastMode = currentMode;
-            currentMode = Mode.Frightened;
         }
-
-        timer2 = new Timer(10000, this);
-        timer2.start();
+        currentMode = Mode.Frightened;
+        timer2.restart();
 
         nextDirectionX = -directionX;
         nextDirectionY = -directionY;
@@ -289,6 +320,11 @@ public class Pinky implements Ghost,  ActionListener
     public void actionPerformed(ActionEvent e)
     {
         if(currentMode == Mode.Frightened)
+        {
+            currentMode = Mode.FrightenedEnd;
+            timer2.setDelay(4000);
+        }
+        else if(currentMode == Mode.FrightenedEnd)
         {
             currentMode = lastMode;
             timer2.stop();
