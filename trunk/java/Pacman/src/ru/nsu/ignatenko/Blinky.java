@@ -54,8 +54,9 @@ public class Blinky implements Ghost, ActionListener
 	private final int frightenSpeed = 2;
 	private int currentSpeed = normalSpeed;
 
-	private Timer timer1 = new Timer(7000, this);
-	private Timer timer2;
+    private Timer timer1 = new Timer(7000, this);
+    private Timer timer2 = new Timer(10000, this);
+
 	PacMan pacman;
 
 	public Blinky(int screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
@@ -71,8 +72,25 @@ public class Blinky implements Ghost, ActionListener
         coordX = x * blocksize + blocksize/2;
 		coordY = y * blocksize + blocksize/2;
 
-		timer1.start();
+        timer1.setDelay(20000);
+        timer1.start();
 	}
+
+    public void setStartPos(int x, int y)
+    {
+        startPosX = x;
+        startPosY = y;
+        posX = startPosX;
+        posY = startPosY;
+        coordX = x * blocksize + blocksize/2;
+        coordY = y * blocksize + blocksize/2;
+    }
+
+    public void stop()
+    {
+        timer1.stop();
+        timer2.stop();
+    }
 
 	public void setVictim(PacMan pacman_)
 	{
@@ -93,18 +111,43 @@ public class Blinky implements Ghost, ActionListener
 		return coordY;
 	}
 
+	public Direction getDirection()
+	{
+		if(directionX == -1)
+		{
+			return Direction.Left;
+		}
+		else if(directionX == 1)
+		{
+			return Direction.Right;
+		}
+		else if(directionY == -1)
+		{
+			return Direction.Up;
+		}
+		else
+		{
+			return Direction.Down;
+		}
+	}
+
 	public int getPosX()
 	{
+        posX = coordX / blocksize;
 		return posX;
 	}
 
 	public int getPosY()
 	{
+        posY = coordY / blocksize;
 		return posY;
 	}
 
 	public int getPos()
 	{
+        posX = coordX / blocksize;
+        posY = coordY / blocksize;
+        pos = posY * ncollumn + posX;
 		return pos;
 	}
 
@@ -116,17 +159,15 @@ public class Blinky implements Ghost, ActionListener
 
 	private void changeMode()
 	{
-		if(currentMode == Mode.Scatter)
-		{
-			currentMode = Mode.Chase;
-			timer1.stop();
-			timer1 = new Timer(20000, this);
-			timer1.start();
-		}
-		else
-		{
-			makeScatter();
-		}
+        if(currentMode == Mode.Scatter)
+        {
+            currentMode = Mode.Chase;
+        }
+        else
+        {
+            currentMode = Mode.Scatter;
+            timer1.restart();
+        }
 	}
 
 	public void stopFrighten()
@@ -136,12 +177,11 @@ public class Blinky implements Ghost, ActionListener
 		timer1.start();
 	}
 
-	public void makeScatter()
+	public void setScatterMode()
 	{
-		currentMode = Mode.Scatter;
-		timer1.stop();
-		timer1 = new Timer(7000, this);
-		timer1.start();
+        currentMode = Mode.Scatter;
+        timer1.setDelay(20000);
+        timer1.restart();
 	}
 
 	private double calculateDistance(int posX_, int posY_)
@@ -151,12 +191,12 @@ public class Blinky implements Ghost, ActionListener
 
 	public void move()
 	{
-		if(coordX % blocksize == blocksize/2 && coordY % blocksize == blocksize/2) // if blinky enter in center of the cell
+        if(coordX % blocksize == blocksize/2 && coordY % blocksize == blocksize/2) // if blinky enter in center of the cell
 		{
 			directionX = nextDirectionX;
 			directionY = nextDirectionY;
 
-			if(currentMode == Mode.Frightened)
+			if(currentMode == Mode.Frightened || currentMode == Mode.FrightenedEnd)
 			{
 				currentSpeed = frightenSpeed;
 
@@ -276,39 +316,38 @@ public class Blinky implements Ghost, ActionListener
 
 	public void setFrightenedMode()
 	{
-		if(currentMode == Mode.Frightened)
-		{
-			timer2.stop();
-		}
-		else
-		{
-			timer1.stop();
+        if(currentMode != Mode.Frightened && currentMode != Mode.FrightenedEnd)
+        {
+            timer1.stop();
+            lastMode = currentMode;
+        }
 
-			lastMode = currentMode;
-			currentMode = Mode.Frightened;
-		}
+        currentMode = Mode.Frightened;
+        timer2.restart();
 
-		timer2 = new Timer(10000, this);
-		timer2.start();
-
-		nextDirectionX = -directionX;
-		nextDirectionY = -directionY;
+        nextDirectionX = -directionX;
+        nextDirectionY = -directionY;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		if(currentMode == Mode.Frightened)
-		{
-			currentMode = lastMode;
-			timer2.stop();
-			timer1.start();
-		}
-		else
-		{
-			changeMode();
-			nextDirectionX = -directionX;
-			nextDirectionY = -directionY;
-		}
+        if(currentMode == Mode.Frightened)
+        {
+            currentMode = Mode.FrightenedEnd;
+            timer2.setDelay(4000);
+        }
+        else if(currentMode == Mode.FrightenedEnd)
+        {
+            currentMode = lastMode;
+            timer2.stop();
+            timer1.start();
+        }
+        else
+        {
+            changeMode();
+            nextDirectionX = -directionX;
+            nextDirectionY = -directionY;
+        }
 	}
 }

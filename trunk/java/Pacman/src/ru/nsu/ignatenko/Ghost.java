@@ -2,7 +2,7 @@ package ru.nsu.ignatenko;
 
 enum Mode
 {
-    Scatter, Chase, Frightened
+    Scatter, Chase, Frightened, FrightenedEnd
 }
 
 public interface Ghost
@@ -11,7 +11,8 @@ public interface Ghost
     public void setFrightenedMode();
     public void returnToInitialPosition();
     public void stopFrighten();
-    public void makeScatter();
+    public void setScatterMode();
+    public void setStartPos(int posX, int posY);
     public int getPos();
     public int getCoordX();
     public int getCoordY();
@@ -19,6 +20,9 @@ public interface Ghost
     public String getName();
     public void canMove();
     public void cantMove();
+    public void stop();
     public void setVictim(PacMan pacman);
     public void setBlinky(Blinky blinky);
+    public Direction getDirection();
+
 }

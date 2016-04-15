@@ -65,6 +65,22 @@ class PacMan
         requiredDirectionY = directionY_;
 	}
 
+    public void setStartPos(int x, int y)
+    {
+        startPosX = x;
+        startPosY = y;
+        posX = startPosX;
+        posY = startPosY;
+        pos = posY * ncollumn + posX;
+        coordX = posX * blocksize + blocksize/2;
+        coordY = posY * blocksize + blocksize/2;
+
+        obstacleOnTop 	= 	(screenData[pos - ncollumn] == WALL) || (screenData[pos - ncollumn + directionX] == WALL);
+        obstacleOnBottom =	(screenData[pos + ncollumn] == WALL) || (screenData[pos + ncollumn + directionX] == WALL);
+        obstacleOnLeft 	=	(screenData[pos - 1] == WALL) || (screenData[pos - 1 + directionY*ncollumn] == WALL);
+        obstacleOnRight =	(screenData[pos + 1] == WALL) || (screenData[pos + 1 + directionY*ncollumn] == WALL);
+    }
+
     public void returnToInitialPosition()
     {
         posX = startPosX;
@@ -165,7 +181,11 @@ class PacMan
         return posY;
     }
 
-    public int getPos() {
+    public int getPos()
+    {
+        posX = coordX / blocksize;
+        posY = coordY / blocksize;
+        pos = posY * ncollumn + posX;
         return pos;
     }
 
