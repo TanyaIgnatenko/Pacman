@@ -137,13 +137,13 @@ class PacMan
             }
 		}
 
-        if(directionX == LEFT && !obstacleOnLeft && (screenData[pos-1] == LEFT_PORTAL))
+        if(directionX == LEFT && !obstacleOnLeft && (screenData[pos] == LEFT_PORTAL))
         {
-            coordX += blocksize*(ncollumn - 2);
+            coordX += blocksize*(ncollumn - 1);
         }
-        else if(directionX == RIGHT && !obstacleOnRight && (screenData[pos+1] == RIGHT_PORTAL))
+        else if(directionX == RIGHT && !obstacleOnRight && (screenData[pos] == RIGHT_PORTAL))
         {
-            coordX -= blocksize*(ncollumn - 2);
+            coordX -= blocksize*(ncollumn - 1);
         }
 		else if(directionX == RIGHT && !obstacleOnRight)
 		{
