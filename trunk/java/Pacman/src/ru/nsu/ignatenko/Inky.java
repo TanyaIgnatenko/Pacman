@@ -173,6 +173,9 @@ public class Inky implements Ghost,  ActionListener
     public void setScatterMode()
     {
         currentMode = Mode.Scatter;
+        timer1.setInitialDelay(7000);
+        timer1.setDelay(20000);
+        timer1.restart();
     }
 
     private double calculateDistance(int posX_, int posY_)

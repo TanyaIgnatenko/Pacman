@@ -180,6 +180,7 @@ public class Blinky implements Ghost, ActionListener
 	public void setScatterMode()
 	{
         currentMode = Mode.Scatter;
+		timer1.setInitialDelay(7000);
         timer1.setDelay(20000);
         timer1.restart();
 	}

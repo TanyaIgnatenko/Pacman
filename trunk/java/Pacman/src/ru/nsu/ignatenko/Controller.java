@@ -6,7 +6,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.Timer;
 
-public class Controller  implements ActionListener
+public class Controller implements ActionListener
 {
     private int screenData[];
 

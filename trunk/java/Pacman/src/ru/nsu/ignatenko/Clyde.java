@@ -169,8 +169,10 @@ public class Clyde implements Ghost,  ActionListener
     public void setScatterMode()
     {
         currentMode = Mode.Scatter;
+        timer1.setInitialDelay(7000);
+        timer1.setDelay(20000);
+        timer1.restart();
     }
-
     private double calculateDistance(int posX_, int posY_)
     {
         return ((posX_ - posTargetX) * (posX_ - posTargetX) + (posY_ - posTargetY) * (posY_ - posTargetY));
