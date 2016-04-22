@@ -8,26 +8,23 @@ import java.util.Map;
 enum Direction
 {
     Left, Right, Up, Down
-};
+}
+
+enum ScreenData
+{
+    Nothing, Wall, Dot, SuperDot, LeftPortal, RightPortal, GhostDoor,
+    BlinkyPlace, PinkyPlace, InkyPlace, ClydePlace, PacmanPlace
+}
 
 public class PacManGame
 {
-    private int screenData[];
+    private ScreenData screenData[];
 
     private final int nrow = 25;
     private final int ncollumn = 23;
     private final int blocksize = 24;
 
-    private final int SUPER_DOT = 3;
-    private final int DOT = 2;
-
-    private final int BLINKY_PLACE = 7;
-    private final int PINKY_PLACE = 8;
-    private final int INKY_PLACE = 9;
-    private final int CLYDE_PLACE = 10;
-    private final int PACMAN_PLACE = 11;
-
-    private Map<String, Integer> ghostPlaces = new HashMap<>(4);
+    private Map<String, ScreenData> ghostPlaces = new HashMap<>(4);
 
     private Ghost ghosts[] = new Ghost[4];
     private PacMan pacman;
@@ -49,10 +46,10 @@ public class PacManGame
         mazeFiles[1] = "map2.txt";
         mazeFiles[2] = "map3.txt";
 
-        ghostPlaces.put("Blinky", BLINKY_PLACE);
-        ghostPlaces.put("Pinky", PINKY_PLACE);
-        ghostPlaces.put("Inky", INKY_PLACE);
-        ghostPlaces.put("Clyde", CLYDE_PLACE);
+        ghostPlaces.put("Blinky", ScreenData.BlinkyPlace);
+        ghostPlaces.put("Pinky", ScreenData.PinkyPlace);
+        ghostPlaces.put("Inky", ScreenData.InkyPlace);
+        ghostPlaces.put("Clyde", ScreenData.ClydePlace);
     }
 
     public void initGame()
@@ -92,9 +89,9 @@ public class PacManGame
     {
         int posX = 0;
         int posY = 0;
-        for (int data : screenData)
+        for (ScreenData data : screenData)
         {
-            if(data == PACMAN_PLACE)
+            if(data == ScreenData.PacmanPlace)
             {
                 pacman.setStartPos(posX, posY);
                 break;
@@ -115,7 +112,7 @@ public class PacManGame
     {
         int posX = 0;
         int posY = 0;
-        for (int data : screenData)
+        for (ScreenData data : screenData)
         {
             if(data == ghostPlaces.get(ghost.getName()))
             {
@@ -147,14 +144,14 @@ public class PacManGame
             }
             checkCollisions(pacmanPos);
 
-            if (screenData[pacmanPos] == DOT)
+            if (screenData[pacmanPos] == ScreenData.Dot)
             {
-                screenData[pacmanPos] -= DOT;
+                screenData[pacmanPos] = ScreenData.Nothing;
                 score += 10;
             }
-            else if (screenData[pacmanPos] == SUPER_DOT)
+            else if (screenData[pacmanPos] == ScreenData.SuperDot)
             {
-                screenData[pacmanPos] -= SUPER_DOT;
+                screenData[pacmanPos] = ScreenData.Nothing;
                 score += 50;
 
                 for (Ghost ghost : ghosts)
@@ -200,7 +197,7 @@ public class PacManGame
     {
         for (Ghost ghost : ghosts)
         {
-            
+
             if (ghost.getPos() == pacmanPos)
             {
                 if (ghost.getMode() == Mode.Frightened || ghost.getMode() == Mode.FrightenedEnd)
@@ -266,9 +263,9 @@ public class PacManGame
     private int countNumberOfDots()
     {
         int count = 0;
-        for (int val : screenData)
+        for (ScreenData val : screenData)
         {
-            if (val == DOT || val == SUPER_DOT)
+            if (val == ScreenData.Dot || val == ScreenData.SuperDot)
             {
                 ++count;
             }
@@ -286,7 +283,7 @@ public class PacManGame
         return leftLives;
     }
 
-    public int[] getScreenData()
+    public ScreenData[] getScreenData()
     {
         return screenData;
     }
@@ -438,9 +435,9 @@ public class PacManGame
         return -1;
     }
 
-    public int[] loadScreenData(String filename)
+    public ScreenData[] loadScreenData(String filename)
     {
-        int[] screenData;
+        ScreenData[] screenData;
         Map<Integer, Integer> symbolCodes;
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
 
@@ -448,7 +445,7 @@ public class PacManGame
         {
             if(file != null)
             {
-                screenData = new int[nrow * ncollumn];
+                screenData = new ScreenData[nrow * ncollumn];
                 symbolCodes = new HashMap<>();
 
                 symbolCodes.put(32, 0);   //  [space] - empty
@@ -477,7 +474,7 @@ public class PacManGame
                         с = file.read();
                         if((output = symbolCodes.get(с)) != null)
                         {
-                            screenData[i * ncollumn + j] = output.intValue();
+                            screenData[i * ncollumn + j] = ScreenData.values()[output.intValue()];
                         }
                         else
                         {

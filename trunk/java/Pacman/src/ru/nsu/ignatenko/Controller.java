@@ -8,7 +8,7 @@ import javax.swing.Timer;
 
 public class Controller implements ActionListener
 {
-    private int screenData[];
+    private ScreenData screenData[];
 
     private final int LEFT = -1;
     private final int UP = -1;
