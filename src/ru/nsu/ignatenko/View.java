@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,12 +25,12 @@ public class View extends JPanel
 
 	private Controller controller;
 
-	private IntroPanel introPanel;
-    private MainPanel mainPanel;
-    private ChooseMazePanel chooseMazePanel;
-	private TipsPanel tipsPanel;
 	private GamePanel gamePanel;
+	private MainPanel mainPanel;
+	private TipsPanel tipsPanel;
 	private RulesPanel rulesPanel;
+	private IntroPanel introPanel;
+	private ChooseMazePanel chooseMazePanel;
 
 	private JPanel actualPanel = null;
 
@@ -71,7 +70,7 @@ public class View extends JPanel
 		setShownPanel(introPanel);
 	}
 
-    public void startGame(int[] screenData_)
+    public void startGame(ScreenData[] screenData_)
     {
         gamePanel.setScreenData(screenData_);
         setShownPanel(gamePanel);
@@ -419,15 +418,10 @@ public class View extends JPanel
 		private final int mazeIndentX = 25;
 		private final int mazeIndentY = 70;
 
-		private int screenData[];
+		private ScreenData screenData[];
 		private final int nrow = 25;
 		private final int ncollumn = 23;
 		private final int blocksize = 24;
-
-		private final int WALL = 1;
-		private final int DOT = 2;
-		private final int SUPER_DOT = 3;
-		private final int GHOST_DOOR = 6;
 
 		private final int LEFT = -1;
 		private final int UP = -1;
@@ -511,7 +505,7 @@ public class View extends JPanel
 			gameOver = true;
 		}
 
-		public void setScreenData(int[] screenData)
+		public void setScreenData(ScreenData[] screenData)
 		{
 			this.screenData = screenData;
 		}
@@ -745,11 +739,11 @@ public class View extends JPanel
 			{
 				for(int x = mazeIndentX; x < blocksize * ncollumn + mazeIndentX; x += blocksize)
 				{
-					if(screenData[i] == WALL)
+					if(screenData[i] == ScreenData.Wall)
 					{
 						g2d.fillRect(x, y, blocksize, blocksize);
 					}
-					else if(screenData[i] == GHOST_DOOR)
+					else if(screenData[i] == ScreenData.GhostDoor)
 					{
 						g2d.setColor(ghostDoorColor);
 						g2d.fillRect(x, y, blocksize, blocksize);
@@ -769,11 +763,11 @@ public class View extends JPanel
 			{
 				for(int x = mazeIndentX; x < blocksize * ncollumn + mazeIndentX; x += blocksize)
 				{
-					if(screenData[i] == DOT)
+					if(screenData[i] == ScreenData.Dot)
 					{
 						g2d.fillRect(x + 11, y + 11, 4, 4);
 					}
-					else if(screenData[i] == SUPER_DOT)
+					else if(screenData[i] == ScreenData.SuperDot)
 					{
 						g2d.fillOval(x + 6, y + 3, 13, 13);
 					}

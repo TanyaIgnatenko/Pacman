@@ -2,12 +2,10 @@ package ru.nsu.ignatenko;
 
 class PacMan
 {
-    private final int WALL = 1;
-    private final int LEFT_PORTAL = 4;
-    private final int RIGHT_PORTAL = 5;
-    private final int GHOST_DOOR = 6;
 
-    private int screenData[];
+    
+
+    private ScreenData screenData[];
     private int blocksize;
     private int ncollumn;
     private int nrow;
@@ -38,7 +36,7 @@ class PacMan
 	private boolean obstacleOnLeft;
 	private boolean obstacleOnRight;
 
-	public PacMan(int screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
+	public PacMan(ScreenData screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
 	{
         screenData = screenData_;
         nrow = nrow_;
@@ -53,10 +51,10 @@ class PacMan
         coordX = posX * blocksize + blocksize/2;
         coordY = posY * blocksize + blocksize/2;
 
-        obstacleOnTop 	= 	(screenData[pos - ncollumn] == WALL) || (screenData[pos - ncollumn + directionX] == WALL);
-        obstacleOnBottom =	(screenData[pos + ncollumn] == WALL) || (screenData[pos + ncollumn + directionX] == WALL);
-        obstacleOnLeft 	=	(screenData[pos - 1] == WALL) || (screenData[pos - 1 + directionY*ncollumn] == WALL);
-        obstacleOnRight =	(screenData[pos + 1] == WALL) || (screenData[pos + 1 + directionY*ncollumn] == WALL);
+        obstacleOnTop 	= 	(screenData[pos - ncollumn] == ScreenData.Wall) || (screenData[pos - ncollumn + directionX] == ScreenData.Wall);
+        obstacleOnBottom =	(screenData[pos + ncollumn] == ScreenData.Wall) || (screenData[pos + ncollumn + directionX] == ScreenData.Wall);
+        obstacleOnLeft 	=	(screenData[pos - 1] == ScreenData.Wall) || (screenData[pos - 1 + directionY*ncollumn] == ScreenData.Wall);
+        obstacleOnRight =	(screenData[pos + 1] == ScreenData.Wall) || (screenData[pos + 1 + directionY*ncollumn] == ScreenData.Wall);
 	}
 
 	public void setDirection(int directionX_, int directionY_)
@@ -75,10 +73,10 @@ class PacMan
         coordX = posX * blocksize + blocksize/2;
         coordY = posY * blocksize + blocksize/2;
 
-        obstacleOnTop 	= 	(screenData[pos - ncollumn] == WALL) || (screenData[pos - ncollumn + directionX] == WALL);
-        obstacleOnBottom =	(screenData[pos + ncollumn] == WALL) || (screenData[pos + ncollumn + directionX] == WALL);
-        obstacleOnLeft 	=	(screenData[pos - 1] == WALL) || (screenData[pos - 1 + directionY*ncollumn] == WALL);
-        obstacleOnRight =	(screenData[pos + 1] == WALL) || (screenData[pos + 1 + directionY*ncollumn] == WALL);
+        obstacleOnTop 	= 	(screenData[pos - ncollumn] == ScreenData.Wall) || (screenData[pos - ncollumn + directionX] == ScreenData.Wall);
+        obstacleOnBottom =	(screenData[pos + ncollumn] == ScreenData.Wall) || (screenData[pos + ncollumn + directionX] == ScreenData.Wall);
+        obstacleOnLeft 	=	(screenData[pos - 1] == ScreenData.Wall) || (screenData[pos - 1 + directionY*ncollumn] == ScreenData.Wall);
+        obstacleOnRight =	(screenData[pos + 1] == ScreenData.Wall) || (screenData[pos + 1 + directionY*ncollumn] == ScreenData.Wall);
     }
 
     public void returnToInitialPosition()
@@ -99,17 +97,17 @@ class PacMan
     {
 		if(coordX % blocksize == blocksize/2 && coordY % blocksize == blocksize/2)
 		{
-            obstacleOnTop 	= 	(screenData[pos - ncollumn] == WALL) || (screenData[pos - ncollumn + directionX] == WALL);
-            obstacleOnBottom =	(screenData[pos + ncollumn] == WALL) || (screenData[pos + ncollumn + directionX] == WALL)
-                             || (screenData[pos + ncollumn] == GHOST_DOOR)|| (screenData[pos + ncollumn + directionX] == GHOST_DOOR);
-            obstacleOnLeft 	=	(screenData[pos - 1] == WALL) || (screenData[pos - 1 + directionY*ncollumn] == WALL);
-            obstacleOnRight =	(screenData[pos + 1] == WALL) || (screenData[pos + 1 + directionY*ncollumn] == WALL);
+            obstacleOnTop 	= 	(screenData[pos - ncollumn] == ScreenData.Wall) || (screenData[pos - ncollumn + directionX] == ScreenData.Wall);
+            obstacleOnBottom =	(screenData[pos + ncollumn] == ScreenData.Wall) || (screenData[pos + ncollumn + directionX] == ScreenData.Wall)
+                             || (screenData[pos + ncollumn] == ScreenData.GhostDoor)|| (screenData[pos + ncollumn + directionX] == ScreenData.GhostDoor);
+            obstacleOnLeft 	=	(screenData[pos - 1] == ScreenData.Wall) || (screenData[pos - 1 + directionY*ncollumn] == ScreenData.Wall);
+            obstacleOnRight =	(screenData[pos + 1] == ScreenData.Wall) || (screenData[pos + 1 + directionY*ncollumn] == ScreenData.Wall);
 
-            boolean reqObstacleOnTop 	= (screenData[pos - ncollumn] == WALL) || (screenData[pos - ncollumn + requiredDirectionX] == WALL);
-            boolean reqObstacleOnBottom =	(screenData[pos + ncollumn] == WALL) || (screenData[pos + ncollumn + requiredDirectionX] == WALL)
-                                         || (screenData[pos + ncollumn] == GHOST_DOOR)|| (screenData[pos + ncollumn + requiredDirectionX] == GHOST_DOOR);
-            boolean reqObstacleOnLeft = (screenData[pos - 1] == WALL) || (screenData[pos - 1 + requiredDirectionY*ncollumn] == WALL);
-            boolean reqObstacleOnRight = (screenData[pos + 1] == WALL) || (screenData[pos + 1 + requiredDirectionY*ncollumn] == WALL);
+            boolean reqObstacleOnTop 	= (screenData[pos - ncollumn] == ScreenData.Wall) || (screenData[pos - ncollumn + requiredDirectionX] == ScreenData.Wall);
+            boolean reqObstacleOnBottom =	(screenData[pos + ncollumn] == ScreenData.Wall) || (screenData[pos + ncollumn + requiredDirectionX] == ScreenData.Wall)
+                                         || (screenData[pos + ncollumn] == ScreenData.GhostDoor)|| (screenData[pos + ncollumn + requiredDirectionX] == ScreenData.GhostDoor);
+            boolean reqObstacleOnLeft = (screenData[pos - 1] == ScreenData.Wall) || (screenData[pos - 1 + requiredDirectionY*ncollumn] == ScreenData.Wall);
+            boolean reqObstacleOnRight = (screenData[pos + 1] == ScreenData.Wall) || (screenData[pos + 1 + requiredDirectionY*ncollumn] == ScreenData.Wall);
 
             if(requiredDirectionX == LEFT && !reqObstacleOnLeft)
             {
@@ -137,11 +135,11 @@ class PacMan
             }
 		}
 
-        if(directionX == LEFT && !obstacleOnLeft && (screenData[pos] == LEFT_PORTAL))
+        if(directionX == LEFT && !obstacleOnLeft && (screenData[pos] == ScreenData.LeftPortal))
         {
             coordX += blocksize*(ncollumn - 1);
         }
-        else if(directionX == RIGHT && !obstacleOnRight && (screenData[pos] == RIGHT_PORTAL))
+        else if(directionX == RIGHT && !obstacleOnRight && (screenData[pos] == ScreenData.RightPortal))
         {
             coordX -= blocksize*(ncollumn - 1);
         }

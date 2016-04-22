@@ -11,15 +11,10 @@ public class Clyde implements Ghost,  ActionListener
 {
     private final String name = "Clyde";
 
-    private int screenData[];
+    private ScreenData screenData[];
     private int blocksize;
     private int ncollumn;
     private int nrow;
-
-    private final int WALL = 1;
-    private final int LEFT_PORTAL = 4;
-    private final int RIGHT_PORTAL = 5;
-    private final int GHOST_DOOR = 6;
 
     private final int LEFT = -1;
     private final int UP = -1;
@@ -61,7 +56,7 @@ public class Clyde implements Ghost,  ActionListener
     private Timer timer2 = new Timer(10000, this);
     PacMan pacman;
 
-    public Clyde(int screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
+    public Clyde(ScreenData screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
     {
         nrow = nrow_;
         ncollumn = ncollumn_;
@@ -253,10 +248,10 @@ public class Clyde implements Ghost,  ActionListener
                     distance[2] = calculateDistance(nextPosX, nextPosY + 1); // down cell
                     distance[3] = calculateDistance(nextPosX + 1, nextPosY); // right cell
 
-                    obstacleOnTop = (screenData[nextPos - ncollumn] == WALL);
-                    obstacleOnBottom = (screenData[nextPos + ncollumn] == WALL) || (screenData[nextPos + ncollumn] == GHOST_DOOR);
-                    obstacleOnLeft = (screenData[nextPos - 1] == WALL);
-                    obstacleOnRight = (screenData[nextPos + 1] == WALL);
+                    obstacleOnTop = (screenData[nextPos - ncollumn] == ScreenData.Wall);
+                    obstacleOnBottom = (screenData[nextPos + ncollumn] == ScreenData.Wall) || (screenData[nextPos + ncollumn] == ScreenData.GhostDoor);
+                    obstacleOnLeft = (screenData[nextPos - 1] == ScreenData.Wall);
+                    obstacleOnRight = (screenData[nextPos + 1] == ScreenData.Wall);
 
                     boolean is_possible[] = new boolean[4];
                     is_possible[0] = !obstacleOnTop && directionY != DOWN;
@@ -294,11 +289,11 @@ public class Clyde implements Ghost,  ActionListener
                     }
                 }
 
-                if (directionX == LEFT && !obstacleOnLeft && (screenData[pos - 1] == LEFT_PORTAL))
+                if (directionX == LEFT && !obstacleOnLeft && (screenData[pos - 1] == ScreenData.LeftPortal))
                 {
                     coordX += blocksize * (ncollumn - 2);
                 }
-                else if (directionX == RIGHT && !obstacleOnRight && (screenData[pos + 1] == RIGHT_PORTAL))
+                else if (directionX == RIGHT && !obstacleOnRight && (screenData[pos + 1] == ScreenData.RightPortal))
                 {
                     coordX -= blocksize * (ncollumn - 2);
                 }
