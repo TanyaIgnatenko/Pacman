@@ -1,10 +1,7 @@
 package ru.nsu.ignatenko;
 
-class PacMan
+class PacMan implements MovableObject
 {
-
-    
-
     private ScreenData screenData[];
     private int blocksize;
     private int ncollumn;

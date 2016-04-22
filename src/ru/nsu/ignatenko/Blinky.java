@@ -7,7 +7,7 @@ import javax.swing.Timer;
 
 import java.util.Random;
 
-public class Blinky implements Ghost, ActionListener
+public class Blinky implements Ghost, ActionListener, MovableObject
 {
 	private final String name = "Blinky";
 
@@ -52,7 +52,7 @@ public class Blinky implements Ghost, ActionListener
     private Timer timer1 = new Timer(7000, this);
     private Timer timer2 = new Timer(10000, this);
 
-	PacMan pacman;
+	MovableObject pacman;
 
 	public Blinky(ScreenData screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
 	{
@@ -125,6 +125,9 @@ public class Blinky implements Ghost, ActionListener
 			return Direction.Down;
 		}
 	}
+
+	public int getDirectionX() {return 0;}
+	public int getDirectionY() {return 0;}
 
 	public int getPosX()
 	{

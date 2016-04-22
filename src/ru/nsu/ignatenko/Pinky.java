@@ -51,7 +51,7 @@ public class Pinky implements Ghost,  ActionListener
 
     private Timer timer1 = new Timer(7000, this);
     private Timer timer2 = new Timer(10000, this);
-    PacMan pacman;
+    MovableObject pacman;
 
     public Pinky(ScreenData screenData_[], int nrow_, int ncollumn_, int blocksize_, int x, int y)
     {
