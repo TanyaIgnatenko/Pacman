@@ -24,5 +24,4 @@ public interface Ghost
     public void setVictim(PacMan pacman);
     public void setBlinky(Blinky blinky);
     public Direction getDirection();
-
 }
